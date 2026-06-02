@@ -1,0 +1,49 @@
+# Node / JS
+node_modules/
+npm-debug.log*
+.yarn/
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# Java / Maven / Gradle
+target/
+*.class
+*.jar
+*.war
+.gradle/
+build/
+
+# Go
+vendor/
+*.exe
+
+# Rust
+target/
+Cargo.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+.env
+*.log
+
+# Terraform
+*.tfstate
+*.tfstate.backup
+.terraform/

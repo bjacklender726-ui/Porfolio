@@ -1,0 +1,17 @@
+version: "3.9"
+services:
+  sample-app:
+    build: .
+    container_name: pc-sample-app
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    environment:
+      DATABASE_URL: postgresql://admin:admin123@postgres:5432/sample_app_db
+    networks:
+      - proyecto-central-net
+
+networks:
+  proyecto-central-net:
+    external: true

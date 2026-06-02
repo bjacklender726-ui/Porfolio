@@ -1,0 +1,24 @@
+# Modo desarrollo del portfolio (BD compartida usa la raíz)
+version: "3.9"
+
+services:
+  portfolio-dev:
+    build:
+      context: .
+      target: builder
+    container_name: pc-portfolio-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      DATABASE_URL: postgresql://admin:admin123@postgres:5432/portfolio_db
+      NODE_ENV: development
+    command: ["npm", "run", "dev"]
+    networks:
+      - proyecto-central-net
+
+networks:
+  proyecto-central-net:
+    external: true

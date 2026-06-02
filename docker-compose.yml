@@ -1,0 +1,44 @@
+version: "3.9"
+
+networks:
+  net:
+    name: proyecto-central-net
+
+volumes:
+  pgdata:
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pc-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: &db_user admin
+      POSTGRES_PASSWORD: &db_pass admin123
+      POSTGRES_DB: &db_name proyecto_central
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./scripts/init-dbs.sh:/docker-entrypoint-initdb.d/init-dbs.sh:ro
+    networks:
+      - net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d proyecto_central"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  portfolio:
+    build: ./portfolio
+    container_name: pc-portfolio
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://admin:admin123@postgres:5432/portfolio_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - net
