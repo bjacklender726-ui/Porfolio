@@ -24,3 +24,8 @@ img {
   max-width: 100%;
   display: block;
 }
+
+@media (max-width: 640px) {
+  .nav-links { display: none !important; }
+  .menu-toggle { display: block !important; }
+}
