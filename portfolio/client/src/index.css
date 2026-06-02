@@ -25,6 +25,10 @@ img {
   display: block;
 }
 
+section {
+  scroll-margin-top: 4rem;
+}
+
 @media (max-width: 640px) {
   .nav-links { display: none !important; }
   .menu-toggle { display: block !important; }

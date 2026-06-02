@@ -8,6 +8,20 @@ const projects = [
     github_url: 'https://github.com/bjacklender726-ui/Porfolio',
     featured: true,
   },
+  {
+    title: 'API REST Template',
+    description: 'Template de API REST con Express, autenticación JWT y PostgreSQL.',
+    tech_stack: ['Node.js', 'Express', 'PostgreSQL', 'JWT', 'Docker'],
+    github_url: '#',
+    featured: false,
+  },
+  {
+    title: 'App de Tareas',
+    description: 'Aplicación full-stack de gestión de tareas con React y Node.js.',
+    tech_stack: ['React', 'Node.js', 'PostgreSQL', 'Docker'],
+    github_url: '#',
+    featured: false,
+  },
 ]
 
 async function seed() {
