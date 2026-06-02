@@ -13,9 +13,9 @@ services:
     container_name: pc-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: &db_user admin
-      POSTGRES_PASSWORD: &db_pass admin123
-      POSTGRES_DB: &db_name proyecto_central
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: proyecto_central
     ports:
       - "5432:5432"
     volumes:
@@ -34,9 +34,14 @@ services:
     container_name: pc-portfolio
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "4000:4000"
     environment:
-      DATABASE_URL: postgresql://admin:admin123@postgres:5432/portfolio_db
+      PORT: 4000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: admin
+      DB_PASS: admin123
+      DB_NAME: portfolio_db
     depends_on:
       postgres:
         condition: service_healthy

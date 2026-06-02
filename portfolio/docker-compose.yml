@@ -1,0 +1,28 @@
+# Desarrollo: levanta frontend con hot-reload y backend con watch
+version: "3.9"
+services:
+  portfolio-dev:
+    build:
+      context: .
+      target: build
+    container_name: pc-portfolio-dev
+    ports:
+      - "3000:3000"
+      - "4000:4000"
+    volumes:
+      - ./client/src:/app/client/src
+      - ./server/src:/app/server/src
+    environment:
+      DB_HOST: postgres
+      DB_USER: admin
+      DB_PASS: admin123
+      DB_NAME: portfolio_db
+    command: >
+      sh -c "cd /app/client && npm run build -- --watch &
+             cd /app/server && node --watch src/index.js"
+    networks:
+      - proyecto-central-net
+
+networks:
+  proyecto-central-net:
+    external: true

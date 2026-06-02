@@ -17,6 +17,12 @@ app.use(express.json())
 app.use('/api/projects', projectsRouter)
 app.use('/api/contact', contactRouter)
 
+const publicPath = join(__dirname, '..', 'public')
+app.use(express.static(publicPath))
+app.get('*', (_req, res) => {
+  res.sendFile(join(publicPath, 'index.html'))
+})
+
 async function runMigrations() {
   const files = ['001_create_projects.sql', '002_create_contact_messages.sql']
   for (const file of files) {
