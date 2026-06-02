@@ -61,4 +61,8 @@ Luego añádelo al `docker-compose.yml` raíz para que se despliegue con el rest
 
 ## Estrategia de ramas
 
-Ver [docs/git-flow.md](docs/git-flow.md).
+Ver [docs/git-flow.md](docs/git-flow.md) para la guía completa incluyendo:
+- Git Flow con `main` / `develop` / `feature/*`
+- **Convención de commits (Conventional Commits)**
+- **Ejemplo práctico paso a paso** para construir el portfolio
+- Política de pushes a GitHub
