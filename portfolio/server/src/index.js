@@ -21,10 +21,11 @@ app.use('/api/contact', contactRouter)
 if (process.env.NODE_ENV !== 'production' || process.env.GRAFANA_PROXY) {
   const grafanaTarget = process.env.GRAFANA_URL || 'http://pc-grafana:3000'
   app.use(
+    '/grafana',
     createProxyMiddleware({
       target: grafanaTarget,
       changeOrigin: true,
-      pathFilter: '/grafana',
+      pathRewrite: { '^/': '/grafana/' },
       secure: false,
       on: {
         proxyRes: (proxyRes) => {
@@ -34,7 +35,7 @@ if (process.env.NODE_ENV !== 'production' || process.env.GRAFANA_PROXY) {
         },
         error: (err, req, res) => {
           console.error('Grafana proxy error:', err.code, err.message)
-          if (!res.headersSent) res.redirect(302, grafanaTarget + req.path)
+          if (!res.headersSent) res.redirect(302, grafanaTarget + req.originalUrl.replace('/grafana', ''))
         }
       }
     })
