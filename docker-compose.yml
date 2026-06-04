@@ -43,6 +43,7 @@ services:
       DB_USER: admin
       DB_PASS: admin123
       DB_NAME: portfolio_db
+      GRAFANA_PROXY: "true"
     depends_on:
       postgres:
         condition: service_healthy
@@ -59,6 +60,8 @@ services:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: admin123
       GF_INSTALL_PLUGINS:
+      GF_SERVER_ROOT_URL: /grafana
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
     volumes:
       - ./grafana/datasources:/etc/grafana/provisioning/datasources
       - ./grafana/dashboards:/etc/grafana/provisioning/dashboards

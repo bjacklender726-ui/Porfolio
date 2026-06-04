@@ -3,6 +3,7 @@ import cors from 'cors'
 import { readFileSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
+import { createProxyMiddleware } from 'http-proxy-middleware'
 import pool from './db.js'
 import projectsRouter from './routes/projects.js'
 import contactRouter from './routes/contact.js'
@@ -16,6 +17,17 @@ app.use(express.json())
 
 app.use('/api/projects', projectsRouter)
 app.use('/api/contact', contactRouter)
+
+if (process.env.NODE_ENV !== 'production' || process.env.GRAFANA_PROXY) {
+  app.use(
+    '/grafana',
+    createProxyMiddleware({
+      target: 'http://pc-grafana:3000',
+      changeOrigin: true,
+      pathRewrite: { '^/grafana': '' },
+    })
+  )
+}
 
 const publicPath = join(__dirname, '..', 'public')
 app.use(express.static(publicPath))
