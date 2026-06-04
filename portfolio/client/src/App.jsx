@@ -11,9 +11,9 @@ function App() {
       <Navbar />
       <main>
         <Hero />
-        <About />
-        <Projects />
-        <Contact />
+        <div className="fade-in"><About /></div>
+        <div className="fade-in"><Projects /></div>
+        <div className="fade-in"><Contact /></div>
       </main>
       <Footer />
     </div>
