@@ -1,3 +1,19 @@
+:root {
+  --color-primary: #2563eb;
+  --color-primary-dark: #1d4ed8;
+  --color-primary-light: #60a5fa;
+  --color-accent: #7c3aed;
+  --color-bg: #fafafa;
+  --color-surface: #ffffff;
+  --color-text: #1a1a1a;
+  --color-text-secondary: #6b7280;
+  --color-border: #e5e7eb;
+  --font: 'Inter', system-ui, -apple-system, sans-serif;
+  --max-width: 1100px;
+  --radius: 12px;
+  --transition: 0.3s ease;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -9,10 +25,27 @@ html {
 }
 
 body {
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: var(--font);
   line-height: 1.6;
-  color: #1a1a1a;
-  background: #fafafa;
+  color: var(--color-text);
+  background: var(--color-bg);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(37, 99, 235, 0.06), transparent),
+    radial-gradient(ellipse 50% 40% at 80% 20%, rgba(124, 58, 237, 0.04), transparent),
+    radial-gradient(ellipse 40% 30% at 20% 40%, rgba(37, 99, 235, 0.03), transparent);
+  background-attachment: fixed;
+  min-height: 100vh;
+  animation: bgShift 20s ease-in-out infinite alternate;
+}
+
+@keyframes bgShift {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 100% 20%; }
+}
+
+::selection {
+  background: rgba(37, 99, 235, 0.2);
+  color: inherit;
 }
 
 a {
@@ -27,6 +60,13 @@ img {
 
 section {
   scroll-margin-top: 4rem;
+}
+
+h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-align: center;
 }
 
 @media (max-width: 640px) {
