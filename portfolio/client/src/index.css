@@ -105,6 +105,7 @@ h2 {
 @media (max-width: 768px) {
   .about-grid { grid-template-columns: 1fr !important; gap: 2rem !important; }
   .contact-row { grid-template-columns: 1fr !important; }
+  .footer-grid { grid-template-columns: 1fr !important; text-align: center; }
 }
 
 @media (max-width: 640px) {
