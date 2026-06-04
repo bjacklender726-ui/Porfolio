@@ -34,7 +34,7 @@ if (process.env.NODE_ENV !== 'production' || process.env.GRAFANA_PROXY) {
         },
         error: (err, req, res) => {
           console.error('Grafana proxy error:', err.code, err.message)
-          if (!res.headersSent) res.status(502).send('Grafana unavailable')
+          if (!res.headersSent) res.redirect(302, grafanaTarget + req.path)
         }
       }
     })
