@@ -56,6 +56,15 @@ body {
   100% { transform: translate(10px, -30px) scale(1.02); }
 }
 
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 ::selection {
   background: rgba(37, 99, 235, 0.2);
   color: inherit;
@@ -95,6 +104,7 @@ h2 {
 
 @media (max-width: 768px) {
   .about-grid { grid-template-columns: 1fr !important; gap: 2rem !important; }
+  .contact-row { grid-template-columns: 1fr !important; }
 }
 
 @media (max-width: 640px) {
