@@ -3,7 +3,6 @@ import cors from 'cors'
 import { readFileSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
-import { createProxyMiddleware } from 'http-proxy-middleware'
 import pool from './db.js'
 import projectsRouter from './routes/projects.js'
 import contactRouter from './routes/contact.js'
@@ -19,27 +18,10 @@ app.use('/api/projects', projectsRouter)
 app.use('/api/contact', contactRouter)
 
 if (process.env.NODE_ENV !== 'production' || process.env.GRAFANA_PROXY) {
-  const grafanaTarget = process.env.GRAFANA_URL || 'http://pc-grafana:3000'
-  app.use(
-    '/grafana',
-    createProxyMiddleware({
-      target: grafanaTarget,
-      changeOrigin: true,
-      pathRewrite: { '^/': '/grafana/' },
-      secure: false,
-      on: {
-        proxyRes: (proxyRes) => {
-          if (proxyRes.headers['location']?.startsWith(grafanaTarget)) {
-            proxyRes.headers['location'] = proxyRes.headers['location'].replace(grafanaTarget, '')
-          }
-        },
-        error: (err, req, res) => {
-          console.error('Grafana proxy error:', err.code, err.message)
-          if (!res.headersSent) res.redirect(302, grafanaTarget + req.originalUrl.replace('/grafana', ''))
-        }
-      }
-    })
-  )
+  const grafanaURL = process.env.GRAFANA_URL || 'http://localhost:3001'
+  app.get('/grafana*', (req, res) => {
+    res.redirect(301, grafanaURL + req.originalUrl)
+  })
 }
 
 const publicPath = join(__dirname, '..', 'public')
