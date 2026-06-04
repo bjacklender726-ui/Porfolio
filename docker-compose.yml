@@ -6,6 +6,7 @@ networks:
 
 volumes:
   pgdata:
+  grafana-data:
 
 services:
   postgres:
@@ -42,6 +43,26 @@ services:
       DB_USER: admin
       DB_PASS: admin123
       DB_NAME: portfolio_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - net
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: pc-grafana
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin123
+      GF_INSTALL_PLUGINS:
+    volumes:
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - grafana-data:/var/lib/grafana
     depends_on:
       postgres:
         condition: service_healthy
