@@ -24,7 +24,6 @@ if (process.env.NODE_ENV !== 'production' || process.env.GRAFANA_PROXY) {
     createProxyMiddleware({
       target: process.env.GRAFANA_URL || 'http://pc-grafana:3000',
       changeOrigin: true,
-      pathRewrite: { '^/grafana': '' },
     })
   )
 }
