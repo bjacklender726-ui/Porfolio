@@ -22,7 +22,7 @@ if (process.env.NODE_ENV !== 'production' || process.env.GRAFANA_PROXY) {
   app.use(
     '/grafana',
     createProxyMiddleware({
-      target: 'http://pc-grafana:3000',
+      target: process.env.GRAFANA_URL || 'http://pc-grafana:3000',
       changeOrigin: true,
       pathRewrite: { '^/grafana': '' },
     })
