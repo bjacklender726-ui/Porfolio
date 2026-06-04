@@ -1,5 +1,6 @@
 import Navbar from './components/Navbar.jsx'
 import Hero from './components/Hero.jsx'
+import FadeIn from './components/FadeIn.jsx'
 import About from './components/About.jsx'
 import Projects from './components/Projects.jsx'
 import Contact from './components/Contact.jsx'
@@ -11,9 +12,9 @@ function App() {
       <Navbar />
       <main>
         <Hero />
-        <div className="fade-in"><About /></div>
-        <div className="fade-in"><Projects /></div>
-        <div className="fade-in"><Contact /></div>
+        <FadeIn><About /></FadeIn>
+        <FadeIn><Projects /></FadeIn>
+        <FadeIn><Contact /></FadeIn>
       </main>
       <Footer />
     </div>
