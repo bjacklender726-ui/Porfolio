@@ -25,12 +25,18 @@ if (process.env.NODE_ENV !== 'production' || process.env.GRAFANA_PROXY) {
       target: grafanaTarget,
       changeOrigin: true,
       pathFilter: '/grafana',
-      cookieDomainRewrite: '',
-      onProxyRes: (proxyRes) => {
-        if (proxyRes.headers['location']?.startsWith(grafanaTarget)) {
-          proxyRes.headers['location'] = proxyRes.headers['location'].replace(grafanaTarget, '')
+      secure: false,
+      on: {
+        proxyRes: (proxyRes) => {
+          if (proxyRes.headers['location']?.startsWith(grafanaTarget)) {
+            proxyRes.headers['location'] = proxyRes.headers['location'].replace(grafanaTarget, '')
+          }
+        },
+        error: (err, req, res) => {
+          console.error('Grafana proxy error:', err.code, err.message)
+          if (!res.headersSent) res.status(502).send('Grafana unavailable')
         }
-      },
+      }
     })
   )
 }
