@@ -19,7 +19,7 @@ app.use('/api/contact', contactRouter)
 
 if (process.env.NODE_ENV !== 'production' || process.env.GRAFANA_PROXY) {
   const grafanaURL = process.env.GRAFANA_URL || 'http://localhost:3001'
-  app.get('/grafana*', (req, res) => {
+  app.use('/grafana', (req, res) => {
     res.redirect(301, grafanaURL + req.originalUrl)
   })
 }
