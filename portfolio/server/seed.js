@@ -9,6 +9,14 @@ const projects = [
     featured: true,
   },
   {
+    title: 'Viajeros',
+    description: 'Sitio web de viajes con Astro, Express CRUD, autenticación JWT y panel admin.',
+    tech_stack: ['Astro', 'Node.js', 'Express', 'PostgreSQL', 'Swagger', 'Docker'],
+    github_url: '#',
+    demo_url: 'http://localhost:4001',
+    featured: true,
+  },
+  {
     title: 'API REST Template',
     description: 'Template de API REST con Express, autenticación JWT y PostgreSQL.',
     tech_stack: ['Node.js', 'Express', 'PostgreSQL', 'JWT', 'Docker'],
@@ -28,10 +36,10 @@ async function seed() {
   try {
     for (const p of projects) {
       await pool.query(
-        `INSERT INTO projects (title, description, tech_stack, github_url, featured)
-         VALUES ($1, $2, $3, $4, $5)
+        `INSERT INTO projects (title, description, tech_stack, github_url, demo_url, featured)
+         VALUES ($1, $2, $3, $4, $5, $6)
          ON CONFLICT DO NOTHING`,
-        [p.title, p.description, p.tech_stack, p.github_url, p.featured]
+        [p.title, p.description, p.tech_stack, p.github_url, p.demo_url || null, p.featured]
       )
     }
     console.log('Seed completado')
