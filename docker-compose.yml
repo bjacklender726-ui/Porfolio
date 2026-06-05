@@ -50,6 +50,25 @@ services:
     networks:
       - net
 
+  travel-website:
+    build: ./projects/travel-website
+    container_name: pc-travel
+    restart: unless-stopped
+    ports:
+      - "4001:4001"
+    environment:
+      PORT: 4001
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: admin
+      DB_PASS: admin123
+      DB_NAME: travel_db
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - net
+
   grafana:
     image: grafana/grafana:latest
     container_name: pc-grafana
