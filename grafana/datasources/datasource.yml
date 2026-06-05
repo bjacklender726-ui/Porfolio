@@ -4,12 +4,12 @@ datasources:
   - name: PostgreSQL
     type: postgres
     access: proxy
-    url: ${GRAFANA_DB_HOST}:${GRAFANA_DB_PORT}
+    url: ${GRAFANA_DB_HOST}:5432
     database: ${GRAFANA_DB_NAME}
     user: ${GRAFANA_DB_USER}
     secureJsonData:
       password: ${GRAFANA_DB_PASS}
     jsonData:
-      sslmode: disable
+      sslmode: ${GRAFANA_DB_SSLMODE:disable}
       postgresVersion: 1600
       timescaledb: false
