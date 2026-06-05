@@ -39,6 +39,10 @@ Cargo.lock
 .DS_Store
 Thumbs.db
 
+# Build output / cache
+dist/
+.astro/
+
 # Docker
 .env
 *.log
