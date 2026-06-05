@@ -6,22 +6,19 @@ const projects = [
     description: 'Sitio web de viajes con Astro, Express CRUD, autenticación JWT y panel admin.',
     tech_stack: ['Astro', 'Node.js', 'Express', 'PostgreSQL', 'Swagger', 'Docker'],
     github_url: '#',
-    demo_url: 'http://localhost:4001',
+    demo_url: process.env.VIAJEROS_URL || 'http://localhost:4001',
     featured: true,
   },
 ]
 
 export async function runSeed() {
   await pool.query('DELETE FROM projects')
-  // Solo insertar Viajeros en desarrollo local (no en Render/producción)
-  if (process.env.NODE_ENV !== 'production') {
-    for (const p of projects) {
-      await pool.query(
-        `INSERT INTO projects (title, description, tech_stack, github_url, demo_url, featured)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
-        [p.title, p.description, p.tech_stack, p.github_url, p.demo_url || null, p.featured]
-      )
-    }
+  for (const p of projects) {
+    await pool.query(
+      `INSERT INTO projects (title, description, tech_stack, github_url, demo_url, featured)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [p.title, p.description, p.tech_stack, p.github_url, p.demo_url || null, p.featured]
+    )
   }
   console.log('Seed completado')
 }
