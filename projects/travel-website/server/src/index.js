@@ -4,7 +4,7 @@ import swaggerJsdoc from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
-import pool from './db.js'
+import pool, { ensureDatabase } from './db.js'
 import authRouter from './routes/auth.js'
 import destinationsRouter from './routes/destinations.js'
 import packagesRouter from './routes/packages.js'
@@ -64,6 +64,7 @@ async function runMigrations() {
 
 app.listen(PORT, async () => {
   try {
+    await ensureDatabase()
     await runMigrations()
     console.log(`Viajeros API corriendo en http://localhost:${PORT}`)
     console.log(`Swagger UI: http://localhost:${PORT}/api-docs`)
