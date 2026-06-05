@@ -1,0 +1,49 @@
+---
+import Base from '../../layouts/Base.astro'
+---
+
+<Base title="Paquetes">
+  <section class="section page-hero">
+    <div class="container">
+      <h1 class="page-title">Paquetes</h1>
+      <p class="page-desc">Elige el paquete perfecto para tu próxima aventura.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="pkg-grid" id="pkg-grid"></div>
+      <p class="empty" id="pkg-empty" style="display:none">No hay paquetes disponibles aún.</p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .page-hero { padding-top: 140px; padding-bottom: 40px; background: var(--deep-blue); color: white; }
+  .page-title { font-size: 2.5rem; margin-bottom: 8px; }
+  .page-desc { opacity: 0.85; font-size: 1.05rem; }
+  .pkg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 24px; }
+  .empty { text-align: center; color: var(--text-light); padding: 60px; }
+</style>
+
+<script>
+  fetch('/api/packages').then(r => r.json()).then(pkgs => {
+    const grid = document.getElementById('pkg-grid')
+    const empty = document.getElementById('pkg-empty')
+    if (!pkgs.length) { empty.style.display = 'block'; return }
+    grid.innerHTML = pkgs.map(p => `
+      <a href="/packages/${p.id}" class="card pkg-card" style="display:block">
+        <div style="padding:24px">
+          <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:4px">${p.name}</h3>
+          <p style="font-size:0.85rem;color:var(--text-light);margin-bottom:12px">${p.destination_name}, ${p.country}</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:0.9rem">
+            <span>${p.duration_days} días</span>
+            <span style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--terracotta)">$${Number(p.price).toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+          </div>
+          <p style="font-size:0.9rem;color:var(--text-light);margin-bottom:16px">${(p.description || '').slice(0, 80)}...</p>
+          <span style="color:var(--deep-blue);font-weight:600;font-size:0.9rem">Ver detalle →</span>
+        </div>
+      </a>
+    `).join('')
+  }).catch(() => {})
+</script>

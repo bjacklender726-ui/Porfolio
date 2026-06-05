@@ -1,0 +1,83 @@
+---
+import '../styles/global.css'
+import Footer from '../components/Footer.astro'
+const { title } = Astro.props
+const path = Astro.url.pathname
+---
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title ? `${title} | Viajeros` : 'Viajeros'}</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+</head>
+<body>
+  <nav id="navbar" class="navbar">
+    <div class="container nav-inner">
+      <a href="/" class="logo">Viajeros</a>
+      <div class="nav-links">
+        <a href="/destinations" class={path.startsWith('/destinations') ? 'active' : ''}>Destinos</a>
+        <a href="/packages" class={path.startsWith('/packages') ? 'active' : ''}>Paquetes</a>
+        <a href="/admin/destinations" class={path.startsWith('/admin') ? 'active' : ''}>Admin</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <slot />
+  </main>
+
+  <Footer />
+</body>
+</html>
+
+<style>
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    padding: 16px 0;
+    transition: var(--transition);
+  }
+  .navbar.scrolled {
+    background: white;
+    box-shadow: var(--shadow);
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: white;
+  }
+  .navbar.scrolled .logo { color: var(--deep-blue); }
+  .nav-links { display: flex; gap: 24px; }
+  .nav-links a {
+    color: rgba(255,255,255,0.85);
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: var(--transition);
+  }
+  .nav-links a:hover,
+  .nav-links a.active { color: white; }
+  .navbar.scrolled .nav-links a { color: var(--text); }
+  .navbar.scrolled .nav-links a:hover,
+  .navbar.scrolled .nav-links a.active { color: var(--terracotta); }
+
+  main { min-height: 100vh; }
+</style>
+
+<script>
+  window.addEventListener('scroll', () => {
+    const nav = document.getElementById('navbar')
+    nav.classList.toggle('scrolled', window.scrollY > 80)
+  })
+</script>

@@ -1,0 +1,39 @@
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  role VARCHAR(20) DEFAULT 'user',
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS destinations (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(200) NOT NULL,
+  country VARCHAR(100) NOT NULL,
+  description TEXT,
+  image_url VARCHAR(500),
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS packages (
+  id SERIAL PRIMARY KEY,
+  destination_id INTEGER NOT NULL REFERENCES destinations(id) ON DELETE CASCADE,
+  name VARCHAR(200) NOT NULL,
+  price NUMERIC(10,2) NOT NULL,
+  duration_days INTEGER NOT NULL,
+  description TEXT,
+  max_people INTEGER DEFAULT 10,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS bookings (
+  id SERIAL PRIMARY KEY,
+  package_id INTEGER NOT NULL REFERENCES packages(id) ON DELETE CASCADE,
+  customer_name VARCHAR(100) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  people INTEGER NOT NULL DEFAULT 1,
+  travel_date DATE NOT NULL,
+  notes TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);

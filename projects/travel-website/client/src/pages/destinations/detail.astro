@@ -1,0 +1,97 @@
+---
+import Base from '../../layouts/Base.astro'
+---
+
+<Base title="Destino">
+  <section class="hero-sm" id="hero-section">
+    <div class="hero-sm-overlay">
+      <div class="container">
+        <span class="hero-sm-country" id="dest-country"></span>
+        <h1 class="hero-sm-title" id="dest-title"></h1>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="detail-layout">
+        <div class="detail-main">
+          <h2 id="dest-heading"></h2>
+          <p class="detail-text" id="dest-desc"></p>
+        </div>
+        <div class="detail-sidebar">
+          <div class="info-card">
+            <h4>País</h4>
+            <p id="dest-country-sidebar"></p>
+            <a href="/packages" class="btn btn-primary" style="margin-top:16px;width:100%;text-align:center">Ver paquetes</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container">
+      <h2 class="section-title">Paquetes disponibles</h2>
+      <div class="pkg-grid" id="pkg-grid"></div>
+      <p class="empty" id="pkg-empty" style="display:none">No hay paquetes para este destino aún.</p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero-sm { height: 400px; background-size: cover; background-position: center; background-color: #333; }
+  .hero-sm-overlay { height: 100%; background: rgba(0,0,0,0.4); display: flex; align-items: flex-end; padding-bottom: 40px; }
+  .hero-sm-country { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); font-weight: 600; }
+  .hero-sm-title { color: white; font-size: clamp(2rem, 5vw, 3.5rem); text-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+  .detail-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; }
+  .detail-main h2 { font-size: 1.8rem; margin-bottom: 16px; color: var(--deep-blue); }
+  .detail-text { font-size: 1.05rem; line-height: 1.8; color: var(--text); }
+  .info-card { background: white; padding: 24px; border-radius: 12px; box-shadow: var(--shadow); }
+  .info-card h4 { font-family: 'Playfair Display', serif; margin-bottom: 8px; font-size: 1rem; }
+  .info-card p { color: var(--text-light); font-size: 0.95rem; }
+  .section-title { text-align: center; font-size: 2rem; margin-bottom: 40px; color: var(--deep-blue); }
+  .pkg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+  .empty { text-align: center; color: var(--text-light); padding: 40px; }
+  @media (max-width: 768px) { .detail-layout { grid-template-columns: 1fr; } }
+</style>
+
+<script>
+  const id = window.location.pathname.split('/').pop()
+  async function load() {
+    try {
+      const res = await fetch(`/api/destinations/${id}`)
+      if (!res.ok) throw new Error('Not found')
+      const dest = await res.json()
+      document.getElementById('dest-title').textContent = dest.name
+      document.getElementById('dest-country').textContent = dest.country
+      document.getElementById('dest-heading').textContent = `Sobre ${dest.name}`
+      document.getElementById('dest-desc').textContent = dest.description
+      document.getElementById('dest-country-sidebar').textContent = dest.country
+      if (dest.image_url) document.getElementById('hero-section').style.backgroundImage = `url(${dest.image_url})`
+
+      const pkgRes = await fetch('/api/packages')
+      const packages = (await pkgRes.json()).filter(p => p.destination_id == id)
+      const grid = document.getElementById('pkg-grid')
+      const empty = document.getElementById('pkg-empty')
+      if (packages.length === 0) { empty.style.display = 'block'; return }
+      grid.innerHTML = packages.map(p => `
+        <a href="/packages/${p.id}" class="card pkg-card" style="display:block">
+          <div class="pkg-body" style="padding:24px">
+            <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:4px">${p.name}</h3>
+            <p style="font-size:0.85rem;color:var(--text-light);margin-bottom:12px">${p.destination_name}, ${dest.country}</p>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:0.9rem">
+              <span>${p.duration_days} días</span>
+              <span style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--terracotta)">$${Number(p.price).toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+            </div>
+            <p style="font-size:0.9rem;color:var(--text-light);margin-bottom:16px">${(p.description || '').slice(0, 80)}...</p>
+            <span style="color:var(--deep-blue);font-weight:600;font-size:0.9rem">Ver detalle →</span>
+          </div>
+        </a>
+      `).join('')
+    } catch {
+      document.querySelector('.detail-main').innerHTML = '<h2>Destino no encontrado</h2><a href="/destinations" class="btn btn-primary">Ver destinos</a>'
+    }
+  }
+  load()
+</script>

@@ -1,0 +1,114 @@
+---
+const { packageId, packageName } = Astro.props
+---
+
+<div class="booking-form">
+  <h3>Reservar: {packageName}</h3>
+  <form id="booking-form" class="form">
+    <input type="hidden" name="package_id" value={packageId} />
+    <div class="form-group">
+      <label for="customer_name">Nombre completo</label>
+      <input type="text" id="customer_name" name="customer_name" required />
+    </div>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="people">Personas</label>
+        <input type="number" id="people" name="people" min="1" max="20" value="1" required />
+      </div>
+      <div class="form-group">
+        <label for="travel_date">Fecha de viaje</label>
+        <input type="date" id="travel_date" name="travel_date" required />
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="notes">Notas (opcional)</label>
+      <textarea id="notes" name="notes" rows="3"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary" id="booking-submit">Reservar ahora</button>
+  </form>
+  <div id="booking-msg" class="booking-msg"></div>
+</div>
+
+<style>
+  .booking-form {
+    background: white;
+    padding: 32px;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+  }
+  .booking-form h3 {
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 20px;
+  }
+  .form { display: flex; flex-direction: column; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .form-group input,
+  .form-group textarea {
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: var(--radius);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    transition: var(--transition);
+  }
+  .form-group input:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(212,168,83,0.15);
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .booking-msg {
+    margin-top: 16px;
+    padding: 12px;
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    display: none;
+  }
+  .booking-msg.success { display: block; background: #d4edda; color: #155724; }
+  .booking-msg.error { display: block; background: #f8d7da; color: #721c24; }
+</style>
+
+<script>
+  document.getElementById('booking-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const form = e.target
+    const data = Object.fromEntries(new FormData(form))
+    const msg = document.getElementById('booking-msg')
+    const btn = document.getElementById('booking-submit')
+    btn.disabled = true; btn.textContent = 'Reservando...'
+    try {
+      const res = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+      if (res.ok) {
+        msg.className = 'booking-msg success'
+        msg.textContent = '¡Reserva confirmada! Te contactaremos pronto.'
+        form.reset()
+      } else {
+        const err = await res.json()
+        msg.className = 'booking-msg error'
+        msg.textContent = err.error || 'Error al reservar'
+      }
+    } catch {
+      msg.className = 'booking-msg error'
+      msg.textContent = 'Error de conexión'
+    }
+    btn.disabled = false; btn.textContent = 'Reservar ahora'
+  })
+</script>

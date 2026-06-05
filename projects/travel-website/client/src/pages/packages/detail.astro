@@ -1,0 +1,120 @@
+---
+import Base from '../../layouts/Base.astro'
+---
+
+<Base title="Paquete">
+  <section class="section page-hero">
+    <div class="container">
+      <span class="breadcrumb"><a href="/packages">Paquetes</a> / <span id="pkg-name-breadcrumb"></span></span>
+      <div class="pkg-header">
+        <div>
+          <h1 class="page-title" id="pkg-title"></h1>
+          <p class="pkg-dest" id="pkg-dest"></p>
+        </div>
+        <div class="pkg-price-tag" id="pkg-price"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="detail-layout">
+        <div class="detail-main">
+          <h2>Descripción del paquete</h2>
+          <p class="detail-text" id="pkg-desc"></p>
+          <div class="pkg-meta-detail" id="pkg-meta"></div>
+        </div>
+        <div class="detail-sidebar" id="booking-wrapper"></div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .page-hero { padding-top: 140px; padding-bottom: 40px; background: var(--deep-blue); color: white; }
+  .breadcrumb { font-size: 0.85rem; opacity: 0.7; display: block; margin-bottom: 16px; }
+  .breadcrumb a { color: white; }
+  .breadcrumb a:hover { color: var(--gold); }
+  .pkg-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
+  .page-title { font-size: 2.5rem; }
+  .pkg-dest { font-size: 1.1rem; opacity: 0.85; margin-top: 8px; }
+  .pkg-price-tag { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--gold); white-space: nowrap; }
+  .detail-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px; align-items: start; }
+  .detail-main h2 { font-size: 1.6rem; margin-bottom: 16px; color: var(--deep-blue); }
+  .detail-text { font-size: 1.05rem; line-height: 1.8; margin-bottom: 32px; }
+  .pkg-meta-detail { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .meta-item { background: var(--sand); padding: 16px; border-radius: var(--radius); text-align: center; }
+  .meta-label { display: block; font-size: 0.8rem; color: var(--text-light); margin-bottom: 4px; }
+  .meta-value { font-weight: 600; font-size: 1rem; color: var(--deep-blue); }
+  @media (max-width: 768px) { .detail-layout { grid-template-columns: 1fr; } .pkg-header { flex-direction: column; } }
+</style>
+
+<script>
+  const id = window.location.pathname.split('/').pop()
+
+  async function load() {
+    try {
+      const res = await fetch(`/api/packages/${id}`)
+      if (!res.ok) throw new Error('Not found')
+      const pkg = await res.json()
+      document.getElementById('pkg-name-breadcrumb').textContent = pkg.name
+      document.getElementById('pkg-title').textContent = pkg.name
+      document.getElementById('pkg-dest').textContent = `${pkg.destination_name}, ${pkg.country}`
+      document.getElementById('pkg-price').textContent = `$${Number(pkg.price).toLocaleString('en-US', {minimumFractionDigits: 2})}`
+      document.getElementById('pkg-desc').textContent = pkg.description
+      document.getElementById('pkg-meta').innerHTML = `
+        <div class="meta-item"><span class="meta-label">Duración</span><span class="meta-value">${pkg.duration_days} días</span></div>
+        <div class="meta-item"><span class="meta-label">Máx. personas</span><span class="meta-value">${pkg.max_people}</span></div>
+        <div class="meta-item"><span class="meta-label">Destino</span><span class="meta-value">${pkg.destination_name}</span></div>
+      `
+      document.getElementById('booking-wrapper').innerHTML = `
+        <div class="booking-form" style="background:white;padding:32px;border-radius:12px;box-shadow:var(--shadow)">
+          <h3 style="font-family:'Playfair Display',serif;margin-bottom:20px">Reservar: ${pkg.name}</h3>
+          <form id="booking-form" class="form" style="display:flex;flex-direction:column;gap:16px">
+            <input type="hidden" name="package_id" value="${pkg.id}" />
+            <div class="form-group" style="display:flex;flex-direction:column;gap:6px">
+              <label for="customer_name" style="font-size:0.85rem;font-weight:500">Nombre completo</label>
+              <input type="text" id="customer_name" name="customer_name" required style="padding:10px 14px;border:1px solid #ddd;border-radius:var(--radius);font-size:0.95rem" />
+            </div>
+            <div class="form-group" style="display:flex;flex-direction:column;gap:6px">
+              <label for="email" style="font-size:0.85rem;font-weight:500">Email</label>
+              <input type="email" id="email" name="email" required style="padding:10px 14px;border:1px solid #ddd;border-radius:var(--radius);font-size:0.95rem" />
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+              <div class="form-group" style="display:flex;flex-direction:column;gap:6px">
+                <label for="people" style="font-size:0.85rem;font-weight:500">Personas</label>
+                <input type="number" id="people" name="people" min="1" max="20" value="1" required style="padding:10px 14px;border:1px solid #ddd;border-radius:var(--radius);font-size:0.95rem" />
+              </div>
+              <div class="form-group" style="display:flex;flex-direction:column;gap:6px">
+                <label for="travel_date" style="font-size:0.85rem;font-weight:500">Fecha</label>
+                <input type="date" id="travel_date" name="travel_date" required style="padding:10px 14px;border:1px solid #ddd;border-radius:var(--radius);font-size:0.95rem" />
+              </div>
+            </div>
+            <div class="form-group" style="display:flex;flex-direction:column;gap:6px">
+              <label for="notes" style="font-size:0.85rem;font-weight:500">Notas</label>
+              <textarea id="notes" name="notes" rows="3" style="padding:10px 14px;border:1px solid #ddd;border-radius:var(--radius);font-size:0.95rem"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%">Reservar ahora</button>
+          </form>
+          <div id="booking-msg" style="margin-top:16px;padding:12px;border-radius:var(--radius);font-size:0.9rem;display:none"></div>
+        </div>
+      `
+      document.getElementById('booking-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault()
+        const data = Object.fromEntries(new FormData(e.target))
+        const msg = document.getElementById('booking-msg')
+        const btn = e.target.querySelector('button')
+        btn.disabled = true; btn.textContent = 'Reservando...'
+        try {
+          const res = await fetch('/api/bookings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+          if (res.ok) { msg.style.display = 'block'; msg.style.background = '#d4edda'; msg.style.color = '#155724'; msg.textContent = '¡Reserva confirmada!'; e.target.reset() }
+          else { const err = await res.json(); msg.style.display = 'block'; msg.style.background = '#f8d7da'; msg.style.color = '#721c24'; msg.textContent = err.error || 'Error' }
+        } catch { msg.style.display = 'block'; msg.style.background = '#f8d7da'; msg.style.color = '#721c24'; msg.textContent = 'Error de conexión' }
+        btn.disabled = false; btn.textContent = 'Reservar ahora'
+      })
+    } catch {
+      document.querySelector('.detail-main').innerHTML = '<h2 style="font-size:1.6rem;color:var(--deep-blue);margin-bottom:16px">Paquete no encontrado</h2><a href="/packages" class="btn btn-primary">Ver paquetes</a>'
+    }
+  }
+  load()
+</script>

@@ -1,0 +1,55 @@
+---
+const { pkg } = Astro.props
+---
+
+<a href={`/packages/${pkg.id}`} class="card pkg-card">
+  <div class="pkg-body">
+    <h3 class="pkg-name">{pkg.name}</h3>
+    <p class="pkg-dest">{pkg.destination_name}, {pkg.country}</p>
+    <div class="pkg-meta">
+      <span>{pkg.duration_days} días</span>
+      <span class="pkg-price">${Number(pkg.price).toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+    </div>
+    <p class="pkg-desc">{pkg.description?.slice(0, 80)}...</p>
+    <span class="pkg-cta">Ver detalle →</span>
+  </div>
+</a>
+
+<style>
+  .pkg-card { display: block; }
+  .pkg-body { padding: 24px; }
+  .pkg-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    margin-bottom: 4px;
+  }
+  .pkg-dest {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    margin-bottom: 12px;
+  }
+  .pkg-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+  }
+  .pkg-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--terracotta);
+  }
+  .pkg-desc {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-bottom: 16px;
+  }
+  .pkg-cta {
+    color: var(--deep-blue);
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .pkg-card:hover .pkg-cta { color: var(--terracotta); }
+</style>

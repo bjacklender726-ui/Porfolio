@@ -1,0 +1,61 @@
+---
+import Base from '../../layouts/Base.astro'
+import AdminTable from '../../components/AdminTable.astro'
+---
+
+<Base title="Admin - Reservas">
+  <section class="section page-hero">
+    <div class="container">
+      <h1 class="page-title">Admin - Reservas</h1>
+      <p class="page-desc">Gestiona las reservas de los clientes.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div id="auth-guard">
+        <p>Verificando sesión...</p>
+      </div>
+      <div id="admin-content" style="display:none">
+        <AdminTable
+          apiEndpoint="/api/bookings"
+          columns={[
+            { key: 'id', label: 'ID' },
+            { key: 'customer_name', label: 'Cliente' },
+            { key: 'email', label: 'Email' },
+            { key: 'package_name', label: 'Paquete' },
+            { key: 'destination_name', label: 'Destino' },
+            { key: 'people', label: 'Personas' },
+            { key: 'travel_date', label: 'Fecha viaje', type: 'date' },
+            { key: 'notes', label: 'Notas' },
+          ]}
+          title="Reservas"
+        />
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .page-hero {
+    padding-top: 140px;
+    padding-bottom: 40px;
+    background: var(--deep-blue);
+    color: white;
+  }
+  .page-title { font-size: 2.5rem; margin-bottom: 8px; }
+  .page-desc { opacity: 0.85; }
+</style>
+
+<script>
+  const token = localStorage.getItem('token')
+  const guard = document.getElementById('auth-guard')
+  const content = document.getElementById('admin-content')
+  if (token) {
+    fetch('/api/auth/me', { headers: { 'Authorization': `Bearer ${token}` } })
+      .then(r => r.ok ? (guard.style.display = 'none', content.style.display = 'block') : (window.location.href = '/login'))
+      .catch(() => { window.location.href = '/login' })
+  } else {
+    window.location.href = '/login'
+  }
+</script>
