@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+mkdir -p /etc/grafana/provisioning/datasources
+
 if [ "$RENDER" = "true" ]; then
   echo "=== Render environment detected ==="
 
