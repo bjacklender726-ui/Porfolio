@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url'
 import pool from './db.js'
 import projectsRouter from './routes/projects.js'
 import contactRouter from './routes/contact.js'
+import { runSeed } from '../seed.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const app = express()
@@ -42,6 +43,7 @@ async function runMigrations() {
 app.listen(PORT, async () => {
   try {
     await runMigrations()
+    await runSeed()
     console.log(`Servidor corriendo en http://localhost:${PORT}`)
   } catch (err) {
     console.error('Error al iniciar:', err)

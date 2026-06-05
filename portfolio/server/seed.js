@@ -32,22 +32,20 @@ const projects = [
   },
 ]
 
-async function seed() {
-  try {
-    for (const p of projects) {
-      await pool.query(
-        `INSERT INTO projects (title, description, tech_stack, github_url, demo_url, featured)
-         VALUES ($1, $2, $3, $4, $5, $6)
-         ON CONFLICT DO NOTHING`,
-        [p.title, p.description, p.tech_stack, p.github_url, p.demo_url || null, p.featured]
-      )
-    }
-    console.log('Seed completado')
-  } catch (err) {
-    console.error('Error en seed:', err)
-  } finally {
-    await pool.end()
+export async function runSeed() {
+  for (const p of projects) {
+    await pool.query(
+      `INSERT INTO projects (title, description, tech_stack, github_url, demo_url, featured)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       ON CONFLICT DO NOTHING`,
+      [p.title, p.description, p.tech_stack, p.github_url, p.demo_url || null, p.featured]
+    )
   }
+  console.log('Seed completado')
 }
 
-seed()
+// Allow direct execution: node seed.js
+const isMain = process.argv[1] && process.argv[1].replace(/\\/g, '/').endsWith('seed.js')
+if (isMain) {
+  runSeed().then(() => pool.end()).catch(() => pool.end())
+}
