@@ -17,10 +17,9 @@ const path = Astro.url.pathname
   <nav id="navbar" class="navbar">
     <div class="container nav-inner">
       <a href="/" class="logo">Viajeros</a>
-      <div class="nav-links">
+      <div class="nav-links" id="nav-links">
         <a href="/destinations" class={path.startsWith('/destinations') ? 'active' : ''}>Destinos</a>
         <a href="/packages" class={path.startsWith('/packages') ? 'active' : ''}>Paquetes</a>
-        <a href="/admin/destinations" class={path.startsWith('/admin') ? 'active' : ''}>Admin</a>
       </div>
     </div>
   </nav>
@@ -33,51 +32,37 @@ const path = Astro.url.pathname
 </body>
 </html>
 
-<style>
-  .navbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-    padding: 16px 0;
-    transition: var(--transition);
-  }
-  .navbar.scrolled {
-    background: white;
-    box-shadow: var(--shadow);
-  }
-  .nav-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .logo {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
-    font-weight: 900;
-    color: white;
-  }
-  .navbar.scrolled .logo { color: var(--deep-blue); }
-  .nav-links { display: flex; gap: 24px; }
-  .nav-links a {
-    color: rgba(255,255,255,0.85);
-    font-size: 0.9rem;
-    font-weight: 500;
-    transition: var(--transition);
-  }
-  .nav-links a:hover,
-  .nav-links a.active { color: white; }
-  .navbar.scrolled .nav-links a { color: var(--text); }
-  .navbar.scrolled .nav-links a:hover,
-  .navbar.scrolled .nav-links a.active { color: var(--terracotta); }
-
-  main { min-height: 100vh; }
-</style>
-
 <script>
   window.addEventListener('scroll', () => {
     const nav = document.getElementById('navbar')
     nav.classList.toggle('scrolled', window.scrollY > 80)
   })
+
+  const token = localStorage.getItem('token')
+  const user = JSON.parse(localStorage.getItem('user') || 'null')
+  const nav = document.getElementById('nav-links')
+  if (token && user) {
+    const resLink = document.createElement('a')
+    resLink.href = '/mis-reservas'
+    resLink.textContent = 'Mis reservas'
+    if (window.location.pathname === '/mis-reservas') resLink.className = 'active'
+    nav.appendChild(resLink)
+    const logoutLink = document.createElement('a')
+    logoutLink.href = '#'
+    logoutLink.textContent = 'Cerrar sesión'
+    logoutLink.style.opacity = '0.7'
+    logoutLink.addEventListener('click', (e) => {
+      e.preventDefault()
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      window.location.href = '/'
+    })
+    nav.appendChild(logoutLink)
+  } else {
+    const loginLink = document.createElement('a')
+    loginLink.href = '/login'
+    loginLink.textContent = 'Iniciar sesión'
+    if (window.location.pathname === '/login' || window.location.pathname === '/register') loginLink.className = 'active'
+    nav.appendChild(loginLink)
+  }
 </script>

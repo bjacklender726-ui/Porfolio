@@ -23,10 +23,15 @@ const bookings = [
 
 export async function runSeed() {
   const adminPass = await bcrypt.hash('admin123', 10)
+  const demoPass = await bcrypt.hash('demo123', 10)
 
   await pool.query(`INSERT INTO users (name, email, password_hash, role)
     VALUES ('Admin', 'admin@viajeros.com', $1, 'admin')
     ON CONFLICT (email) DO NOTHING`, [adminPass])
+
+  await pool.query(`INSERT INTO users (name, email, password_hash, role)
+    VALUES ('Cliente Demo', 'demo@viajeros.com', $1, 'user')
+    ON CONFLICT (email) DO NOTHING`, [demoPass])
 
   for (const d of destinations) {
     await pool.query(`INSERT INTO destinations (name, country, description, image_url)
@@ -42,14 +47,20 @@ export async function runSeed() {
         [p.destination_id, p.name, p.price, p.duration_days, p.description, p.max_people])
     }
 
-    for (const b of bookings) {
-      await pool.query(`INSERT INTO bookings (package_id, customer_name, email, people, travel_date, notes)
-        VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT DO NOTHING`,
-        [b.package_id, b.customer_name, b.email, b.people, b.travel_date, b.notes])
+    const userResult = await pool.query("SELECT id FROM users WHERE email = 'demo@viajeros.com'")
+    const demoUserId = userResult.rows[0]?.id
+
+    const count = await pool.query('SELECT COUNT(*) FROM bookings')
+    if (count.rows[0].count == '0') {
+      for (const b of bookings) {
+        await pool.query(`INSERT INTO bookings (package_id, customer_name, email, people, travel_date, notes, user_id)
+          VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+          [b.package_id, b.customer_name, b.email, b.people, b.travel_date, b.notes, demoUserId])
+      }
     }
   }
 
-  console.log('Seed completado: admin, destinos, paquetes y reservas insertados')
+  console.log('Seed completado: admin, demo user, destinos, paquetes y reservas insertados')
 }
 
 const isMain = process.argv[1] && process.argv[1].replace(/\\/g, '/').endsWith('seed.js')

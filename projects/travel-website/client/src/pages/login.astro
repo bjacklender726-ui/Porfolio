@@ -60,7 +60,7 @@ import Base from '../layouts/Base.astro'
         const json = await res.json()
         localStorage.setItem('token', json.token)
         localStorage.setItem('user', JSON.stringify(json.user))
-        window.location.href = '/admin/destinations'
+        window.location.href = '/mis-reservas'
       } else {
         const err = await res.json()
         msg.className = 'auth-msg error'

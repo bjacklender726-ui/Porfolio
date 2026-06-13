@@ -1,0 +1,237 @@
+---
+import Base from '../layouts/Base.astro'
+---
+
+<Base title="Mis reservas">
+  <section class="section page-hero">
+    <div class="container">
+      <h1 class="page-title">Mis reservas</h1>
+      <p class="page-desc" id="page-desc">Tus viajes y experiencias con Viajeros</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div id="bookings-container"></div>
+      <div id="login-prompt" style="display:none;text-align:center;padding:60px">
+        <p style="font-size:1.1rem;color:var(--text-light);margin-bottom:24px">Inicia sesión para ver tus reservas</p>
+        <a href="/login" class="btn btn-primary">Iniciar sesión</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .page-hero { padding-top: 140px; padding-bottom: 40px; background: var(--deep-blue); color: white; }
+  .page-title { font-size: 2.5rem; margin-bottom: 8px; }
+  .page-desc { opacity: 0.85; font-size: 1.05rem; }
+  .empty-state { text-align: center; padding: 60px; color: var(--text-light); }
+  .empty-state p { font-size: 1.1rem; margin-bottom: 24px; }
+  .booking-card { background: white; border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 20px; overflow: hidden; }
+  .booking-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; background: var(--sand); border-bottom: 1px solid rgba(0,0,0,0.05); }
+  .booking-header h3 { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: var(--deep-blue); }
+  .booking-status { font-size: 0.8rem; font-weight: 600; padding: 4px 14px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .status-confirmada { background: #d4edda; color: #155724; }
+  .status-cancelada { background: #f8d7da; color: #721c24; }
+  .booking-body { padding: 20px 24px; }
+  .booking-details { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px; }
+  .booking-detail { }
+  .booking-detail .label { font-size: 0.8rem; color: var(--text-light); display: block; margin-bottom: 2px; }
+  .booking-detail .value { font-size: 1rem; font-weight: 500; }
+  .booking-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn-sm { padding: 8px 20px; font-size: 0.85rem; }
+  .btn-outline { background: transparent; border: 2px solid var(--deep-blue); color: var(--deep-blue); }
+  .btn-outline:hover { background: var(--deep-blue); color: white; }
+  .btn-danger { background: transparent; border: 2px solid #c0392b; color: #c0392b; }
+  .btn-danger:hover { background: #c0392b; color: white; }
+  .edit-modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
+  .edit-modal-backdrop.open { display: flex; }
+  .edit-modal { background: white; border-radius: 12px; padding: 32px; max-width: 480px; width: 100%; max-height: 90vh; overflow-y: auto; }
+  .edit-modal h2 { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin-bottom: 20px; color: var(--deep-blue); }
+  .form { display: flex; flex-direction: column; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group label { font-size: 0.85rem; font-weight: 500; }
+  .form-group input, .form-group textarea { padding: 10px 14px; border: 1px solid #ddd; border-radius: var(--radius); font-size: 0.95rem; }
+  .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,168,83,0.15); }
+  .modal-actions { display: flex; gap: 12px; margin-top: 8px; }
+  .modal-actions .btn { flex: 1; }
+  .msg { margin-top: 12px; padding: 12px; border-radius: var(--radius); font-size: 0.9rem; display: none; }
+  .msg.success { display: block; background: #d4edda; color: #155724; }
+  .msg.error { display: block; background: #f8d7da; color: #721c24; }
+</style>
+
+<script>
+  const token = localStorage.getItem('token')
+  const user = JSON.parse(localStorage.getItem('user') || 'null')
+
+  if (!token || !user) {
+    document.getElementById('login-prompt').style.display = 'block'
+  } else {
+    document.getElementById('page-desc').textContent = `Bienvenido, ${user.name}`
+    loadBookings()
+  }
+
+  async function loadBookings() {
+    const container = document.getElementById('bookings-container')
+    try {
+      const res = await fetch('/api/bookings/my-bookings', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (res.status === 401) {
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        window.location.reload()
+        return
+      }
+      const bookings = await res.json()
+      if (!bookings.length) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <p>No tienes reservas aún.</p>
+            <a href="/packages" class="btn btn-primary">Explorar paquetes</a>
+          </div>
+        `
+        return
+      }
+      container.innerHTML = bookings.map(b => renderBooking(b)).join('')
+    } catch {
+      container.innerHTML = `<div class="empty-state"><p>Error al cargar tus reservas.</p></div>`
+    }
+  }
+
+  function renderBooking(b) {
+    const statusClass = b.status === 'cancelada' ? 'status-cancelada' : 'status-confirmada'
+    const statusText = b.status === 'cancelada' ? 'Cancelada' : 'Confirmada'
+    return `
+      <div class="booking-card" data-id="${b.id}">
+        <div class="booking-header">
+          <h3>${b.package_name}</h3>
+          <span class="booking-status ${statusClass}">${statusText}</span>
+        </div>
+        <div class="booking-body">
+          <div class="booking-details">
+            <div class="booking-detail">
+              <span class="label">Destino</span>
+              <span class="value">${b.destination_name}, ${b.country}</span>
+            </div>
+            <div class="booking-detail">
+              <span class="label">Fecha de viaje</span>
+              <span class="value">${b.travel_date}</span>
+            </div>
+            <div class="booking-detail">
+              <span class="label">Personas</span>
+              <span class="value">${b.people}</span>
+            </div>
+            <div class="booking-detail">
+              <span class="label">Precio por persona</span>
+              <span class="value">$${Number(b.price).toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+            </div>
+            ${b.notes ? `<div class="booking-detail" style="grid-column:1/-1">
+              <span class="label">Notas</span>
+              <span class="value">${b.notes}</span>
+            </div>` : ''}
+          </div>
+          ${b.status !== 'cancelada' ? `
+          <div class="booking-actions">
+            <button class="btn btn-sm btn-outline" onclick="openEditModal(${b.id})">Modificar</button>
+            <button class="btn btn-sm btn-danger" onclick="cancelBooking(${b.id})">Cancelar reserva</button>
+          </div>` : ''}
+        </div>
+      </div>
+    `
+  }
+
+  let editingId = null
+
+  async function openEditModal(id) {
+    editingId = id
+    try {
+      const res = await fetch(`/api/bookings/${id}`)
+      const b = await res.json()
+      document.getElementById('edit-travel_date').value = b.travel_date
+      document.getElementById('edit-people').value = b.people
+      document.getElementById('edit-notes').value = b.notes || ''
+      document.getElementById('edit-modal').classList.add('open')
+      document.getElementById('edit-msg').style.display = 'none'
+    } catch {
+      alert('Error al cargar datos de la reserva')
+    }
+  }
+
+  function closeEditModal() {
+    document.getElementById('edit-modal').classList.remove('open')
+    editingId = null
+  }
+
+  async function submitEdit(e) {
+    e.preventDefault()
+    const data = Object.fromEntries(new FormData(e.target))
+    const msg = document.getElementById('edit-msg')
+    const btn = e.target.querySelector('button[type="submit"]')
+    btn.disabled = true; btn.textContent = 'Guardando...'
+    try {
+      const res = await fetch(`/api/bookings/${editingId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(data),
+      })
+      if (res.ok) {
+        msg.className = 'msg success'
+        msg.textContent = 'Reserva actualizada correctamente'
+        closeEditModal()
+        loadBookings()
+      } else {
+        const err = await res.json()
+        msg.className = 'msg error'
+        msg.textContent = err.error || 'Error al actualizar'
+      }
+    } catch {
+      msg.className = 'msg error'
+      msg.textContent = 'Error de conexión'
+    }
+    btn.disabled = false; btn.textContent = 'Guardar cambios'
+  }
+
+  async function cancelBooking(id) {
+    if (!confirm('¿Estás seguro de cancelar esta reserva?')) return
+    try {
+      const res = await fetch(`/api/bookings/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (res.ok) {
+        loadBookings()
+      } else {
+        const err = await res.json()
+        alert(err.error || 'Error al cancelar')
+      }
+    } catch {
+      alert('Error de conexión')
+    }
+  }
+</script>
+
+<div class="edit-modal-backdrop" id="edit-modal" onclick="if(event.target===this)closeEditModal()">
+  <div class="edit-modal">
+    <h2>Modificar reserva</h2>
+    <form id="edit-form" class="form" onsubmit="submitEdit(event)">
+      <div class="form-group">
+        <label for="edit-travel_date">Fecha de viaje</label>
+        <input type="date" id="edit-travel_date" name="travel_date" required />
+      </div>
+      <div class="form-group">
+        <label for="edit-people">Personas</label>
+        <input type="number" id="edit-people" name="people" min="1" max="20" required />
+      </div>
+      <div class="form-group">
+        <label for="edit-notes">Notas</label>
+        <textarea id="edit-notes" name="notes" rows="3"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancelar</button>
+      </div>
+    </form>
+    <div class="msg" id="edit-msg"></div>
+  </div>
+</div>

@@ -59,7 +59,7 @@ app.get('*', (_req, res) => {
 })
 
 async function runMigrations() {
-  const files = ['001_create_tables.sql']
+  const files = ['001_create_tables.sql', '002_add_user_id_to_bookings.sql']
   for (const file of files) {
     const sql = readFileSync(join(__dirname, '..', 'migrations', file), 'utf8')
     await pool.query(sql)
