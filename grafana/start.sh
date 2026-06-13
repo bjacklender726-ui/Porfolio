@@ -11,7 +11,7 @@ if [ "$RENDER" = "true" ]; then
   : "${GRAFANA_DB_NAME:=${PGDATABASE:-porfolio_db_3bxy}}"
   : "${GRAFANA_DB_USER:=${PGUSER:-porfolio_db_3bxy_user}}"
   : "${GRAFANA_DB_PASS:=${PGPASSWORD:-xjZlfaWEqZjj4mIOKK0JdmfKpDMPAc0p}}"
-  : "${GRAFANA_DB_SSLMODE:=require}"
+  : "${GRAFANA_DB_SSLMODE:=disable}"
   : "${GF_SERVER_ROOT_URL:=https://porfolio-grafana.onrender.com}"
   export GF_SERVER_ROOT_URL
 
