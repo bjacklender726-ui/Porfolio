@@ -70,4 +70,7 @@ DOCKEREOF
 
 fi
 
+# Forzar reset del datasource en SQLite
+sqlite3 /var/lib/grafana/grafana.db "UPDATE data_source SET is_default=1 WHERE name='PostgreSQL';" 2>/dev/null || true
+
 exec /run.sh
