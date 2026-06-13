@@ -10,6 +10,7 @@ import authRouter from './routes/auth.js'
 import destinationsRouter from './routes/destinations.js'
 import packagesRouter from './routes/packages.js'
 import bookingsRouter from './routes/bookings.js'
+import uploadRouter from './routes/upload.js'
 import { runSeed } from '../seed.js'
 import downloadImages from '../scripts/download-images.js'
 
@@ -39,6 +40,7 @@ app.use('/api/auth', authRouter)
 app.use('/api/destinations', destinationsRouter)
 app.use('/api/packages', packagesRouter)
 app.use('/api/bookings', bookingsRouter)
+app.use('/api/upload', uploadRouter)
 
 const publicPath = join(__dirname, '..', 'public')
 app.use(express.static(publicPath))

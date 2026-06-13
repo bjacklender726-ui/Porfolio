@@ -7,27 +7,15 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const imagesDir = join(__dirname, '..', 'public', 'images')
 
 const images = [
-  {
-    file: 'machu-picchu.jpg',
-    url: 'https://images.unsplash.com/photo-1587595431973-160d0d94add1?w=1000',
-  },
-  {
-    file: 'torres-del-paine.jpg',
-    url: 'https://images.unsplash.com/photo-1526392060635-9d6019884377?w=1000',
-  },
-  {
-    file: 'cartagena.jpg',
-    url: 'https://images.unsplash.com/photo-1589553438787-18ba0b2e9904?w=1000',
-  },
-  {
-    file: 'buenos-aires.jpg',
-    url: 'https://images.unsplash.com/photo-1612295797482-50d9d2adfce0?w=1000',
-  },
+  { file: 'machu-picchu.jpg', url: 'https://picsum.photos/seed/machupicchu/800/600' },
+  { file: 'torres-del-paine.jpg', url: 'https://picsum.photos/seed/torresdelpaine/800/600' },
+  { file: 'cartagena.jpg', url: 'https://picsum.photos/seed/cartagena/800/600' },
+  { file: 'buenos-aires.jpg', url: 'https://picsum.photos/seed/buenosaires/800/600' },
 ]
 
 function download(url, dest) {
   return new Promise((resolve, reject) => {
-    https.get(url, (res) => {
+    https.get(url, { headers: { 'User-Agent': 'Viajeros/1.0' } }, (res) => {
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
         download(res.headers.location, dest).then(resolve).catch(reject)
         return
@@ -47,7 +35,7 @@ function download(url, dest) {
   })
 }
 
-async function downloadImages() {
+export default async function downloadImages() {
   if (!existsSync(imagesDir)) {
     mkdirSync(imagesDir, { recursive: true })
   }
@@ -62,18 +50,17 @@ async function downloadImages() {
     try {
       console.log(`  ↓ ${img.file}...`)
       await download(img.url, dest)
-      console.log(`  ✓ ${img.file} descargado`)
+      const stats = existsSync(dest) ? 'ok' : 'error'
+      console.log(`  ✓ ${img.file} (${stats})`)
       count++
     } catch (err) {
       console.error(`  ✗ ${img.file}: ${err.message}`)
     }
   }
-  console.log(`\nImágenes descargadas: ${count} nuevas, ${images.length - count - (images.length - Object.keys(images).length)} existentes`)
+  console.log(`\nImágenes: ${count} nuevas descargadas`)
 }
 
 const isMain = process.argv[1] && process.argv[1].replace(/\\/g, '/').endsWith('download-images.js')
 if (isMain) {
-  downloadImages().catch(() => process.exit(1))
+  downloadImages().then(() => process.exit(0)).catch(() => process.exit(1))
 }
-
-export default downloadImages
