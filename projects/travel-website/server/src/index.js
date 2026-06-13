@@ -11,6 +11,7 @@ import destinationsRouter from './routes/destinations.js'
 import packagesRouter from './routes/packages.js'
 import bookingsRouter from './routes/bookings.js'
 import { runSeed } from '../seed.js'
+import downloadImages from '../scripts/download-images.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const app = express()
@@ -68,6 +69,7 @@ app.listen(PORT, async () => {
   try {
     await ensureDatabase()
     await runMigrations()
+    await downloadImages()
     await runSeed()
     console.log(`Viajeros API corriendo en http://localhost:${PORT}`)
     console.log(`Swagger UI: http://localhost:${PORT}/api-docs`)
