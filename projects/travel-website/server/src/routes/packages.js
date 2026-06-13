@@ -1,7 +1,28 @@
 import { Router } from 'express'
 import pool from '../db.js'
+import { authenticate, adminOnly } from '../middleware/auth.js'
 
 const router = Router()
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     Package:
+ *       type: object
+ *       properties:
+ *         id: { type: integer }
+ *         destination_id: { type: integer }
+ *         name: { type: string }
+ *         price: { type: number }
+ *         duration_days: { type: integer }
+ *         description: { type: string }
+ *         max_people: { type: integer }
+ *         created_at: { type: string, format: date-time }
+ *         destination_name: { type: string }
+ *         country: { type: string }
+ *       required: [destination_id, name, price, duration_days]
+ */
 
 /**
  * @openapi
@@ -12,25 +33,12 @@ const router = Router()
  *     responses:
  *       200:
  *         description: Array de paquetes
- *   post:
- *     summary: Crear un paquete
- *     tags: [Paquetes]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               destination_id: { type: integer }
- *               name: { type: string }
- *               price: { type: number }
- *               duration_days: { type: integer }
- *               description: { type: string }
- *               max_people: { type: integer }
- *     responses:
- *       201:
- *         description: Paquete creado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Package'
  */
 router.get('/', async (_req, res) => {
   try {
@@ -47,6 +55,27 @@ router.get('/', async (_req, res) => {
   }
 })
 
+/**
+ * @openapi
+ * /packages/{id}:
+ *   get:
+ *     summary: Obtener un paquete por ID
+ *     tags: [Paquetes]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Datos del paquete
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Package'
+ *       404:
+ *         description: Paquete no encontrado
+ */
 router.get('/:id', async (req, res) => {
   try {
     const result = await pool.query(`
@@ -63,9 +92,46 @@ router.get('/:id', async (req, res) => {
   }
 })
 
-router.post('/', async (req, res) => {
+/**
+ * @openapi
+ * /packages:
+ *   post:
+ *     summary: Crear un paquete
+ *     tags: [Paquetes]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [destination_id, name, price, duration_days]
+ *             properties:
+ *               destination_id: { type: integer }
+ *               name: { type: string }
+ *               price: { type: number }
+ *               duration_days: { type: integer }
+ *               description: { type: string }
+ *               max_people: { type: integer }
+ *     responses:
+ *       201:
+ *         description: Paquete creado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Package'
+ *       401:
+ *         description: No autenticado
+ *       400:
+ *         description: Datos inválidos
+ */
+router.post('/', authenticate, adminOnly, async (req, res) => {
   try {
     const { destination_id, name, price, duration_days, description, max_people } = req.body
+    if (!destination_id || !name || price === undefined || !duration_days) {
+      return res.status(400).json({ error: 'Faltan campos requeridos' })
+    }
     const result = await pool.query(
       `INSERT INTO packages (destination_id, name, price, duration_days, description, max_people)
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
@@ -78,7 +144,45 @@ router.post('/', async (req, res) => {
   }
 })
 
-router.put('/:id', async (req, res) => {
+/**
+ * @openapi
+ * /packages/{id}:
+ *   put:
+ *     summary: Actualizar un paquete
+ *     tags: [Paquetes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               destination_id: { type: integer }
+ *               name: { type: string }
+ *               price: { type: number }
+ *               duration_days: { type: integer }
+ *               description: { type: string }
+ *               max_people: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Paquete actualizado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Package'
+ *       401:
+ *         description: No autenticado
+ *       404:
+ *         description: Paquete no encontrado
+ */
+router.put('/:id', authenticate, adminOnly, async (req, res) => {
   try {
     const { destination_id, name, price, duration_days, description, max_people } = req.body
     const result = await pool.query(
@@ -94,7 +198,28 @@ router.put('/:id', async (req, res) => {
   }
 })
 
-router.delete('/:id', async (req, res) => {
+/**
+ * @openapi
+ * /packages/{id}:
+ *   delete:
+ *     summary: Eliminar un paquete
+ *     tags: [Paquetes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: integer }
+ *     responses:
+ *       200:
+ *         description: Paquete eliminado
+ *       401:
+ *         description: No autenticado
+ *       404:
+ *         description: Paquete no encontrado
+ */
+router.delete('/:id', authenticate, adminOnly, async (req, res) => {
   try {
     const result = await pool.query('DELETE FROM packages WHERE id = $1 RETURNING id', [req.params.id])
     if (!result.rows.length) return res.status(404).json({ error: 'Paquete no encontrado' })

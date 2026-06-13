@@ -4,11 +4,13 @@ import swaggerJsdoc from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
+import { readFileSync } from 'fs'
 import pool, { ensureDatabase } from './db.js'
 import authRouter from './routes/auth.js'
 import destinationsRouter from './routes/destinations.js'
 import packagesRouter from './routes/packages.js'
 import bookingsRouter from './routes/bookings.js'
+import { runSeed } from '../seed.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const app = express()
@@ -20,7 +22,7 @@ const swaggerSpec = swaggerJsdoc({
     openapi: '3.0.0',
     info: {
       title: 'Viajeros API',
-      version: '0.1.0',
+      version: '1.0.0',
       description: 'API REST del sitio de viajes Viajeros',
     },
     servers: [{ url: `/api` }],
@@ -56,7 +58,7 @@ app.get('*', (_req, res) => {
 async function runMigrations() {
   const files = ['001_create_tables.sql']
   for (const file of files) {
-    const sql = await import('fs').then(f => f.readFileSync(join(__dirname, '..', 'migrations', file), 'utf8'))
+    const sql = readFileSync(join(__dirname, '..', 'migrations', file), 'utf8')
     await pool.query(sql)
   }
   console.log('Migraciones aplicadas')
@@ -66,6 +68,7 @@ app.listen(PORT, async () => {
   try {
     await ensureDatabase()
     await runMigrations()
+    await runSeed()
     console.log(`Viajeros API corriendo en http://localhost:${PORT}`)
     console.log(`Swagger UI: http://localhost:${PORT}/api-docs`)
   } catch (err) {
