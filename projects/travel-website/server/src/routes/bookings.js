@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import jwt from 'jsonwebtoken'
 import pool from '../db.js'
 import { authenticate } from '../middleware/auth.js'
 
@@ -164,7 +165,6 @@ router.post('/', async (req, res) => {
     const header = req.headers.authorization
     if (header) {
       try {
-        const jwt = (await import('jsonwebtoken')).default
         const decoded = jwt.verify(header.replace('Bearer ', ''), process.env.JWT_SECRET || 'viajeros-secret-dev')
         user_id = decoded.id
       } catch {}
