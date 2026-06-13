@@ -11,6 +11,10 @@ const images = [
   { file: 'torres-del-paine.jpg', url: 'https://picsum.photos/seed/torresdelpaine/800/600' },
   { file: 'cartagena.jpg', url: 'https://picsum.photos/seed/cartagena/800/600' },
   { file: 'buenos-aires.jpg', url: 'https://picsum.photos/seed/buenosaires/800/600' },
+  { file: 'hero-1.jpg', url: 'https://picsum.photos/seed/hero1/1600/900' },
+  { file: 'hero-2.jpg', url: 'https://picsum.photos/seed/hero2/1600/900' },
+  { file: 'hero-3.jpg', url: 'https://picsum.photos/seed/hero3/1600/900' },
+  { file: 'hero-4.jpg', url: 'https://picsum.photos/seed/hero4/1600/900' },
 ]
 
 function download(url, dest) {
