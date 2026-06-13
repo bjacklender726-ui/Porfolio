@@ -26,6 +26,7 @@ datasources:
     url: ${GRAFANA_DB_HOST}:5432
     database: ${GRAFANA_DB_NAME}
     user: ${GRAFANA_DB_USER}
+    isDefault: true
     secureJsonData:
       password: ${GRAFANA_DB_PASS}
     jsonData:
@@ -58,6 +59,7 @@ datasources:
     url: ${GRAFANA_DB_HOST}:5432
     database: ${GRAFANA_DB_NAME}
     user: ${GRAFANA_DB_USER}
+    isDefault: true  
     secureJsonData:
       password: ${GRAFANA_DB_PASS}
     jsonData:
