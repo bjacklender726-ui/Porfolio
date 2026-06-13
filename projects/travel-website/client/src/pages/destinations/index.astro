@@ -33,8 +33,11 @@ import Base from '../../layouts/Base.astro'
     if (!dests.length) { empty.style.display = 'block'; return }
     grid.innerHTML = dests.map(d => `
       <a href="/destinations/${d.id}" class="card dest-card" style="display:block">
-        <div style="height:220px;overflow:hidden">
-          <img src="${d.image_url || '/images/placeholder.jpg'}" alt="${d.name}" style="width:100%;height:100%;object-fit:cover;transition:transform 0.3s" loading="lazy" />
+        <div style="height:220px;overflow:hidden;background:var(--sand);display:flex;align-items:center;justify-content:center">
+          ${d.image_url
+            ? `<img src="${d.image_url}" alt="${d.name}" style="width:100%;height:100%;object-fit:cover;transition:transform 0.3s" loading="lazy" />`
+            : `<div style="padding:20px;text-align:center;color:var(--text-light)"><svg width="48" height="48" viewBox="0 0 80 80" fill="none" style="margin:0 auto 8px;display:block;opacity:0.3"><circle cx="40" cy="40" r="36" stroke="#7A706C" stroke-width="2" fill="none"/><ellipse cx="40" cy="40" rx="18" ry="28" stroke="#7A706C" stroke-width="1.5" fill="none"/><ellipse cx="40" cy="40" rx="30" ry="12" stroke="#7A706C" stroke-width="1.5" fill="none"/><line x1="14" y1="40" x2="66" y2="40" stroke="#7A706C" stroke-width="1.5"/></svg><span style="font-size:0.8rem;display:block">Sin imagen</span></div>`
+          }
         </div>
         <div style="padding:20px">
           <span style="font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--terracotta);font-weight:600">${d.country}</span>

@@ -31,17 +31,44 @@ import Hero from '../components/Hero.astro'
       <h2 class="section-title">¿Por qué Viajeros?</h2>
       <div class="features-grid">
         <div class="feature-card">
-          <span class="feature-icon">🌍</span>
+          <div class="feature-icon-wrap">
+            <svg class="feature-icon" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="40" cy="40" r="36" stroke="#C1664B" stroke-width="2.5" fill="#F5F0E8"/>
+              <ellipse cx="40" cy="40" rx="18" ry="32" stroke="#C1664B" stroke-width="2" fill="none"/>
+              <ellipse cx="40" cy="40" rx="32" ry="14" stroke="#C1664B" stroke-width="2" fill="none"/>
+              <line x1="12" y1="40" x2="68" y2="40" stroke="#C1664B" stroke-width="2"/>
+              <path d="M40 4 A36 36 0 0 1 68 24" stroke="#C1664B" stroke-width="1.5" fill="none" opacity="0.5"/>
+              <path d="M40 76 A36 36 0 0 1 12 56" stroke="#C1664B" stroke-width="1.5" fill="none" opacity="0.5"/>
+            </svg>
+          </div>
           <h3>Destinos únicos</h3>
           <p>Seleccionamos los mejores lugares para que vivas experiencias auténticas.</p>
         </div>
         <div class="feature-card">
-          <span class="feature-icon">🤝</span>
+          <div class="feature-icon-wrap">
+            <svg class="feature-icon" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="35" cy="30" r="12" stroke="#C1664B" stroke-width="2.5" fill="#F5F0E8"/>
+              <path d="M16 68 C16 52 24 46 35 46 C46 46 54 52 54 68" stroke="#C1664B" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
+              <circle cx="58" cy="34" r="8" stroke="#D4A853" stroke-width="2" fill="#F5F0E8"/>
+              <path d="M46 65 C46 53 51 49 58 49 C65 49 70 53 70 65" stroke="#D4A853" stroke-width="2" fill="none" stroke-linejoin="round"/>
+              <path d="M60 70 L62 64 L66 62" stroke="#D4A853" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
           <h3>Acompañamiento</h3>
           <p>Guías locales expertos te acompañan en cada destino.</p>
         </div>
         <div class="feature-card">
-          <span class="feature-icon">💰</span>
+          <div class="feature-icon-wrap">
+            <svg class="feature-icon" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="14" y="30" width="52" height="38" rx="6" stroke="#C1664B" stroke-width="2.5" fill="#F5F0E8"/>
+              <path d="M26 30 L30 16 L50 16 L54 30" stroke="#C1664B" stroke-width="2.5" fill="none" stroke-linejoin="round"/>
+              <path d="M32 16 L40 10 L48 16" stroke="#C1664B" stroke-width="2" fill="none" stroke-linejoin="round"/>
+              <circle cx="40" cy="44" r="8" stroke="#D4A853" stroke-width="2" fill="white"/>
+              <text x="40" y="48" text-anchor="middle" fill="#D4A853" font-size="12" font-weight="bold" font-family="Inter">$</text>
+              <line x1="20" y1="58" x2="38" y2="58" stroke="#D4A853" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+              <line x1="20" y1="62" x2="44" y2="62" stroke="#D4A853" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+            </svg>
+          </div>
           <h3>Mejor precio</h3>
           <p>Paquetes todo incluido con la mejor relación calidad-precio.</p>
         </div>
@@ -58,7 +85,8 @@ import Hero from '../components/Hero.astro'
   .section-alt { background: var(--sand); }
   .features-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 32px; }
   .feature-card { text-align: center; padding: 32px; background: white; border-radius: 12px; box-shadow: var(--shadow); }
-  .feature-icon { font-size: 2.5rem; display: block; margin-bottom: 16px; }
+  .feature-icon-wrap { width: 80px; height: 80px; margin: 0 auto 16px; }
+  .feature-icon { width: 100%; height: 100%; }
   .feature-card h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 10px; color: var(--deep-blue); }
   .feature-card p { font-size: 0.9rem; color: var(--text-light); }
 </style>
@@ -68,8 +96,11 @@ import Hero from '../components/Hero.astro'
     const grid = document.getElementById('dest-grid')
     grid.innerHTML = dests.slice(0, 4).map(d => `
       <a href="/destinations/${d.id}" class="card dest-card" style="display:block">
-        <div style="height:220px;overflow:hidden">
-          <img src="${d.image_url || '/images/placeholder.jpg'}" alt="${d.name}" style="width:100%;height:100%;object-fit:cover;transition:transform 0.3s" loading="lazy" />
+        <div style="height:220px;overflow:hidden;background:var(--sand);display:flex;align-items:center;justify-content:center">
+          ${d.image_url
+            ? `<img src="${d.image_url}" alt="${d.name}" style="width:100%;height:100%;object-fit:cover;transition:transform 0.3s" loading="lazy" />`
+            : `<div style="padding:20px;text-align:center;color:var(--text-light)"><svg width="48" height="48" viewBox="0 0 80 80" fill="none" style="margin:0 auto 8px;display:block;opacity:0.3"><circle cx="40" cy="40" r="36" stroke="#7A706C" stroke-width="2" fill="none"/><ellipse cx="40" cy="40" rx="18" ry="28" stroke="#7A706C" stroke-width="1.5" fill="none"/><ellipse cx="40" cy="40" rx="30" ry="12" stroke="#7A706C" stroke-width="1.5" fill="none"/><line x1="14" y1="40" x2="66" y2="40" stroke="#7A706C" stroke-width="1.5"/></svg><span style="font-size:0.8rem;display:block">Sin imagen</span></div>`
+          }
         </div>
         <div style="padding:20px">
           <span style="font-size:0.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--terracotta);font-weight:600">${d.country}</span>

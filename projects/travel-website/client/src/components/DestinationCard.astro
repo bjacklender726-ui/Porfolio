@@ -4,7 +4,18 @@ const { dest } = Astro.props
 
 <a href={`/destinations/${dest.id}`} class="card dest-card">
   <div class="dest-img-wrap">
-    <img src={dest.image_url || '/images/placeholder.jpg'} alt={dest.name} class="dest-img" loading="lazy" />
+    {dest.image_url
+      ? <img src={dest.image_url} alt={dest.name} class="dest-img" loading="lazy" />
+      : <div class="dest-img-placeholder">
+          <svg width="48" height="48" viewBox="0 0 80 80" fill="none" style="opacity:0.3">
+            <circle cx="40" cy="40" r="36" stroke="#7A706C" stroke-width="2" fill="none"/>
+            <ellipse cx="40" cy="40" rx="18" ry="28" stroke="#7A706C" stroke-width="1.5" fill="none"/>
+            <ellipse cx="40" cy="40" rx="30" ry="12" stroke="#7A706C" stroke-width="1.5" fill="none"/>
+            <line x1="14" y1="40" x2="66" y2="40" stroke="#7A706C" stroke-width="1.5"/>
+          </svg>
+          <span>Sin imagen</span>
+        </div>
+    }
   </div>
   <div class="dest-body">
     <span class="dest-country">{dest.country}</span>
@@ -24,6 +35,14 @@ const { dest } = Astro.props
     height: 100%;
     object-fit: cover;
     transition: transform var(--transition);
+  }
+  .dest-img-placeholder {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: var(--sand);
+    color: var(--text-light);
+    font-size: 0.8rem;
   }
   .dest-card:hover .dest-img { transform: scale(1.05); }
   .dest-body { padding: 20px; }
